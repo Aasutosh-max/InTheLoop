@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>InTheLoop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f6f4fb;--card:#fff;--ink:#1d1b2e;--mute:#7a768f;--line:#e6e2f2;--acc:#7c5cff;--acc2:#ff7ab6;--ok:#1fa971;--warn:#e8a317;--pend:#8a86a0;--err:#e5484d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#13111d;--card:#1d1a2c;--ink:#efecff;--mute:#9a96b5;--line:#2e2a45}}
+:root[data-theme=dark]{--bg:#13111d;--card:#1d1a2c;--ink:#efecff;--mute:#9a96b5;--line:#2e2a45}
+*{box-sizing:border-box}html{scroll-padding-top:90px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin:8px 0 14px}
+h1{margin:0;font-size:30px;letter-spacing:-1px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-weight:600}.tag{color:var(--mute);font-size:13px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 11px;transition:.15s}
+button:hover{transform:translateY(-1px);border-color:var(--acc)}
+.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+.pill{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+.pill.err{color:var(--err);border-color:var(--err)}.pill.now{color:var(--acc);border-color:var(--acc)}.pill[hidden]{display:none}.pill.ok{color:var(--ok);border-color:var(--ok)}.pill.busy{color:var(--acc);border-color:var(--acc);animation:pulse 1s infinite}@keyframes pulse{50%{opacity:.45}}.dt{position:relative;display:flex;align-items:center;gap:6px;color:var(--mute);font-size:13px}.dtb{padding:6px 10px;white-space:nowrap}.dtb em{font-style:normal;margin-left:4px;color:var(--ink)}.bar .dt input{position:absolute;left:0;bottom:0;width:100%;height:1px;min-width:0;padding:0;border:0;opacity:0;pointer-events:none}
+.toast{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#fff;border-radius:14px;padding:9px 14px;margin-bottom:12px;animation:in .4s;display:flex;justify-content:space-between;align-items:center}
+.toast button{background:#fff3;color:#fff;border-color:#fff6;margin-left:8px;padding:2px 10px}
+@keyframes in{from{opacity:0;transform:translateY(-8px)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap}.bar input,.bar select{flex:1;min-width:120px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+#q{flex:3 1 220px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}.stat{flex:1;min-width:80px;text-align:center;background:var(--bg);border-radius:12px;padding:8px 4px;font-size:12px;color:var(--mute)}.stat b{display:block;font-size:22px;color:var(--ink)}
+.day{margin:22px 0}
+.dayh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dayh h2{margin:0;font-size:20px;letter-spacing:.5px}
+.dayh input[type=date],.task input[type=date]{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:4px 8px}
+.task{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pend);border-radius:14px;padding:12px;margin:10px 0;transition:.2s}
+.task.s-Un{border-left-color:var(--warn)}.task.s-Co{border-left-color:var(--ok)}
+.task.done input.t{text-decoration:line-through;opacity:.6}
+.task.hl{box-shadow:0 0 0 3px var(--acc2)}
+.task input.t{flex:1;min-width:0;font-size:17px;font-weight:650;border:0;background:transparent;padding:2px 0;outline:0}
+.task input.c,.task textarea{width:100%;border:1px solid transparent;background:var(--bg);border-radius:8px;padding:6px 8px;margin-top:6px}
+.task textarea{min-height:62px;resize:vertical}
+.task input:focus,.task textarea:focus{border-color:var(--acc);outline:0}
+.star{border:0;background:none;font-size:20px;padding:0 4px;color:var(--mute)}.star.on{color:var(--warn)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.row .sp{flex:1}.link{font-size:12px;color:var(--mute)}
+.chip{font-size:12px;color:var(--acc);cursor:pointer;margin-right:6px}
+.over{color:var(--err);font-size:12px;font-weight:600}
+.add{display:flex;gap:6px;margin-top:6px}.add input{flex:1;padding:8px 10px;border-radius:10px;border:1px dashed var(--acc);background:transparent}
+.res{cursor:pointer}.res:hover{border-color:var(--acc)}
+mark{background:#ffe27a55;color:inherit;border-radius:3px}
+.lo{display:block;width:100%;text-align:left;margin:6px 0}
+.empty{text-align:center;color:var(--mute);padding:30px}
+small.m{color:var(--mute)}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}.modal.top{z-index:60}.modal .mbox{width:100%;max-width:460px;max-height:92vh;overflow:auto;margin:0}.fld{display:block;margin-top:10px;font-size:13px;color:var(--mute)}.fld[hidden]{display:none}.fld input,.fld select,.fld textarea{display:block;width:100%;margin-top:3px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}.seg{display:flex;gap:6px;margin-top:3px}.seg button{flex:1}.seg .on{background:var(--acc);color:#fff;border-color:var(--acc)}.mn{width:80px;border:1px solid var(--line);border-radius:10px;padding:4px 8px;background:var(--card)}
+
+.app{display:flex;min-height:100vh}
+.side{width:208px;flex:none;padding:16px 10px;border-right:1px solid var(--line);background:var(--card);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.side h1{font-size:26px}.brand{margin:0 6px 14px}.side-tag{margin:auto 6px 8px;font-size:12px}
+.tab{text-align:left;border:0;background:transparent;padding:10px 12px;border-radius:10px;font-weight:600}
+.tab:hover{background:var(--bg);transform:none}.tab.on{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#fff}
+.main{flex:1;min-width:0;max-width:900px;margin:0 auto;padding:16px}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}.top b{font-size:20px}.top .sp{flex:1}
+.mxs{min-width:150px}.mxs input{width:100%;text-align:center;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px;color:var(--ink)}.mxs .row input{width:48%}.mxs button{padding:0 6px;border:0;background:none}
+.pager{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.pager input{width:64px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);background:var(--bg);text-align:center}
+.tb{border-collapse:collapse;font-size:13px}.tb th,.tb td{border:1px solid var(--line);padding:4px 8px;text-align:left}
+@media(max-width:720px){.app{flex-direction:column}.side{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:1px solid var(--line);padding:10px}.brand{width:100%;margin:0 0 4px}.side-tag{display:none}}
+select,.bar select,.fld select,.task select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:30px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%237a768f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");background-repeat:no-repeat;background-position:right 11px center}
+.task select{border-radius:99px;font-weight:600;padding:6px 30px 6px 12px;border:1px solid var(--line);background-color:var(--bg)}
+.task.s-Co select{color:var(--ok);border-color:var(--ok)}.task.s-Un select{color:var(--warn);border-color:var(--warn)}.task.s-Qu select{color:var(--mute)}
+.task select option,.fld select option{color:var(--ink);background:var(--card);font-weight:400}
+</style></head><body><div class="app"><nav class="side"><div class="brand"><h1>InTheLoop.</h1><div class="sub">Never lose the thread.</div></div>
+<button class="tab on" data-view="home">🏠 Homepage</button><button class="tab" data-view="import">📥 Import</button><button class="tab" data-view="reports">📊 Reports</button><button class="tab" data-view="export">📤 Export</button>
+<div class="tag side-tag">Stay in the loop on your own work — and pick up right where you left off.</div></nav>
+<main class="main"><div class="top"><b id="vn">🏠 Homepage</b><span class="sp"></span><span class="pill" id="sync" hidden></span><button class="pri" id="nd">＋ New Entry</button><button id="theme" title="Toggle theme">🌓</button></div>
+<div id="toast"></div>
+<section id="v-home"><div class="card" id="sumcard"></div>
+<div class="card"><div class="bar"><input id="q" placeholder="🔍 Search title, client, description, #tags, dates…  ( / )"><select id="fs"><option value="" selected disabled hidden>Status</option><option>Concluded</option><option>Unsettled</option><option>Queued</option></select><input id="fc" placeholder="Client" list="clients"><div class="dt"><span>From</span><button type="button" class="dtb" data-pick="ff" title="Pick start date">📅<em id="ffl"></em></button><input id="ff" type="date" tabindex="-1"></div><div class="dt"><span>To</span><button type="button" class="dtb" data-pick="ft" title="Pick end date">📅<em id="ftl"></em></button><input id="ft" type="date" tabindex="-1"></div></div>
+<div class="row"><button id="clr">Clear filters</button></div></div>
+<datalist id="clients"></datalist><div id="out" hidden></div><div id="left"></div><div id="journal"></div><div id="pager"></div></section>
+<section id="v-import" hidden><div class="card"><b>Import entries in bulk</b><p class="tag">Every row is saved as a normal entry, grouped by its date. Columns read: <b>Date, Client, Type</b> (Task/Meeting)<b>, Title, Description, Status</b> (Concluded/Unsettled/Queued)<b>, Reason</b>. Dates like 2026-11-20 or 20/11/2026 both work.</p>
+<div class="row"><button class="pri" data-imp="impx">📗 Import Excel (.xlsx / .xls)</button><button class="pri" data-imp="impc">📄 Import CSV (.csv)</button></div>
+<div class="row"><small class="m">Starting point:</small><button data-tpl="xlsx">Excel template</button><button data-tpl="csv">CSV template</button></div>
+<input type="file" id="impx" accept=".xlsx,.xls" hidden><input type="file" id="impc" accept=".csv,text/csv" hidden></div>
+<div id="iout"></div>
+<div class="card"><b>Restore an InTheLoop backup</b><p class="tag">For a JSON file exported from the Export tab.</p><button data-imp="impj">♻ Restore JSON backup</button><input type="file" id="impj" accept=".json" hidden></div></section>
+<section id="v-reports" hidden><div class="card"><b>Reports</b><p class="tag">Choose a date range (optional), then preview or download any report.</p><div class="row"><label class="fld" style="display:inline-block;margin:0">From <input id="rf" type="date"></label><label class="fld" style="display:inline-block;margin:0">To <input id="rt" type="date"></label></div></div>
+<div id="rlist"></div><div id="rout"></div>
+<div class="card"><b>✨ AI-written report</b><p class="tag">Claude writes a readable narrative of the selected range.</p><button class="pri" id="ai">Generate</button><div id="aiw" hidden><div class="row"><button id="aicp">Copy</button><button id="aidl">⬇ Download .txt</button></div><pre id="aiq" style="white-space:pre-wrap;font:inherit"></pre></div></div></section>
+<section id="v-export" hidden><div class="card"><b>Export your data</b><label class="fld">What to export<select id="escope"><option value="all">All entries</option><option value="filtered">Only entries matching the Homepage filters</option></select></label>
+<div class="row" style="margin-top:12px"><button class="pri" data-exp="xlsx">📗 Excel (.xlsx)</button><button class="pri" data-exp="csv">📄 CSV</button><button data-exp="tsv">📑 TSV</button><button data-exp="html">🌐 HTML</button><button data-exp="md">📝 Markdown</button><button data-exp="json">🧩 JSON (full backup)</button></div>
+<p class="tag">JSON always contains everything and can be restored from the Import tab.</p></div></section>
+</main></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const MSG=["Main character energy. Let’s get things done.","One task at a time, bestie.","Corporate girlie, but make it productive.","Yesterday was character development. Today is execution.","Your future self will thank you for logging this.","Small wins count. Keep going.","Log it now, flex about it later."];
+const ST=["Concluded","Unsettled","Queued"],SI={Concluded:"✅",Unsettled:"⏳",Queued:"🕒"};
+const MAPS={Pending:"Queued","In Progress":"Unsettled",Completed:"Concluded"};
+const fix=d=>{d.tasks=(d.tasks||[]).map(t=>({...t,status:MAPS[t.status]||t.status||"Queued",kind:t.kind||"Task",mins:t.mins||0,reason:t.reason||""}));return d};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid8=()=>Math.random().toString(36).slice(2,9);
+const iso=d=>d.toISOString().slice(0,10);
+const addD=(s,n)=>{const d=new Date(s+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+n);return iso(d)};
+const today=()=>{const d=new Date();return iso(new Date(d.getTime()-d.getTimezoneOffset()*6e4))};
+const fmtD=s=>new Date(s+"T00:00:00Z").toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"});
+const wkday=s=>new Date(s+"T00:00:00Z").toLocaleDateString(undefined,{weekday:"short",timeZone:"UTC"});
+const clone=o=>JSON.parse(JSON.stringify(o));
+const P2=n=>String(n).padStart(2,"0");
+let days=[],col=null,F={q:"",s:"",c:"",f:"",t:""},closed=new Set(),pending=0,errCount=0,lastFail=null,ready=false,lc=false,local=false,sample=null,dl=null,typing=false,dtm=null,view="home",page=1,lastFK="",metrics=[];
+const sorted=()=>[...days].sort((a,b)=>a.date.localeCompare(b.date)||a.id.localeCompare(b.id));
+const dayNo=id=>sorted().findIndex(d=>d.id===id)+1;
+const findTask=id=>{for(const d of days){const t=d.tasks.find(x=>x.id===id);if(t)return{d,t}}return null};
+const tagsOf=t=>[...new Set(((t.title+" "+t.remarks).match(/#[\w-]+/g)||[]).map(x=>x.toLowerCase()))];
+let st="idle",hideT;
+function setSync(){const e=$("#sync");clearTimeout(hideT);e.style.cursor="";
+  if(errCount){st="err";e.hidden=false;e.textContent="Couldn’t save — tap to retry";e.className="pill err";e.style.cursor="pointer"}
+  else if(pending||typing){st="busy";e.hidden=false;e.textContent="On it…";e.className="pill busy"}
+  else if(st==="busy"){st="ok";e.hidden=false;e.textContent="Accomplished ✓";e.className="pill ok";hideT=setTimeout(()=>{st="idle";e.hidden=true},1500)}
+  else{st="idle";e.hidden=true}}
+$("#sync").onclick=()=>{if(errCount&&lastFail){const f=lastFail;lastFail=null;errCount=0;f()}};
+function persist(day){
+  const i=days.findIndex(d=>d.id===day.id);if(i<0)days.push(day);else days[i]=day;
+  const go=()=>{pending++;setSync();let to;return Promise.race([col.doc(day.id).set(clone(day)),new Promise((_,r)=>{to=setTimeout(()=>r(0),8000)})]).then(()=>{clearTimeout(to);pending--;setSync()}).catch(()=>{clearTimeout(to);pending--;errCount++;lastFail=go;setSync()})};
+  return go();
+}
+function remove(id){days=days.filter(x=>x.id!==id);pending++;setSync();let to;Promise.race([col.doc(id).delete(),new Promise((_,r)=>{to=setTimeout(()=>r(0),8000)})]).then(()=>{clearTimeout(to);pending--;setSync()}).catch(()=>{clearTimeout(to);pending--;errCount++;setSync()})}
+let tt;function toast(m,undo){clearTimeout(tt);const el=$("#toast");el.innerHTML=`<div class="toast"><span>${esc(m)}${undo?` <button id="ud">Undo</button>`:""}</span><span style="cursor:pointer" onclick="this.parentNode.remove()">✕</span></div>`;if(undo)$("#ud").onclick=()=>{undo();el.innerHTML=""};tt=setTimeout(()=>{el.innerHTML=""},undo?8000:4500)}
+function mkTask(title,o={}){const n=new Date().toISOString();return{id:"t"+Date.now().toString(36)+uid8(),title,client:o.client||"",remarks:o.remarks||"",status:o.status||"Queued",kind:o.kind||"Task",mins:o.mins||0,reason:o.reason||"",pri:!!o.pri,due:o.due||"",origin:o.origin||null,from:o.from||null,created:n,updated:n}}
+function newDay(date){return{id:"d"+Date.now().toString(36)+uid8(),date,tasks:[],created:new Date().toISOString()}}
+function match(t,d){
+  const hay=[t.title,t.client,t.remarks,t.reason,d.date,t.due].join(" ").toLowerCase();
+  if(F.q&&!F.q.toLowerCase().split(/\s+/).every(w=>hay.includes(w)))return false;
+  if(F.s&&t.status!==F.s)return false;
+  if(F.c&&!(t.client||"").toLowerCase().includes(F.c.toLowerCase()))return false;
+  if(F.f&&d.date<F.f)return false;if(F.t&&d.date>F.t)return false;return true}
+const filtering=()=>F.q||F.s||F.c||F.f||F.t;
+function snippet(t){if(!F.q)return"";const w=F.q.split(/\s+/)[0].toLowerCase();const r=t.remarks||"";const i=r.toLowerCase().indexOf(w);if(i<0)return"";const s=r.slice(Math.max(0,i-30),i+60);return esc(s).replace(new RegExp("("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/&/g,"&amp;")+")","ig"),"<mark>$1</mark>")}
+function taskHTML(t,d){
+  const src=t.from?findTask(t.from):null,over=t.due&&t.due<today()&&t.status!=="Concluded",tg=tagsOf(t);
+  return `<div class="task s-${t.status.slice(0,2)}${t.status==="Concluded"?" done":""}" id="${t.id}" data-d="${d.id}" data-t="${t.id}">
+  <div class="row" style="margin:0"><input class="t" value="${esc(t.title)}" data-f="title" placeholder="Short title (required)"><span class="pill">${esc(t.kind||"Task")}</span><button class="star${t.pri?" on":""}" data-a="star" title="Pin as priority">${t.pri?"★":"☆"}</button></div>
+  <input class="c" value="${esc(t.client)}" data-f="client" list="clients" placeholder="Client (optional)">
+  <textarea data-f="remarks" placeholder="Description — updates, ticket IDs, outcomes… use #tags">${esc(t.remarks)}</textarea>${t.status==="Unsettled"?`<input class="c" value="${esc(t.reason)}" data-f="reason" placeholder="Remarks — why it’s unsettled / work involved">`:""}
+  ${tg.length?`<div style="margin-top:4px">${tg.map(x=>`<span class="chip" data-tag="${esc(x)}">${esc(x)}</span>`).join("")}</div>`:""}
+  <div class="row"><select data-f="status" title="Change status">${ST.map(s=>`<option value="${s}"${s===t.status?" selected":""}>${SI[s]} ${s}</option>`).join("")}</select>
+  
+  <button data-a="carry" title="Copy this entry to the next day">⏭ Carry forward</button><button data-a="dup">⧉</button><button data-a="del" title="Delete">🗑</button>
+  <span class="sp"></span>${src?`<span class="link">↪ from Day ${P2(dayNo(src.d.id))}</span>`:""}</div></div>`}
+const PER=15;
+const pctT=m=>{const t=Number(m.target);return m.target!==""&&m.value!==""&&t>0?Math.round(Number(m.value)*100/t)+"% of target":""};
+function summary(){
+  const E=[];days.forEach(d=>d.tasks.forEach(t=>E.push(t)));
+  const T=E.filter(t=>(t.kind||"Task")==="Task"),c=s=>T.filter(t=>t.status===s).length,cl=new Set(E.map(t=>(t.client||"").trim().toLowerCase()).filter(Boolean)).size,x=(n,l)=>`<div class="stat"><b>${n}</b>${l}</div>`;
+  $("#sumcard").innerHTML=`<b>Summary</b><div class="stats" style="margin-top:8px">${x(T.length,"tasks")}${x(E.length-T.length,"meetings")}${x(cl,"clients")}${x(c("Concluded"),"concluded")}${x(c("Unsettled"),"unsettled")}${x(c("Queued"),"queued")}${x(T.length?Math.round(c("Concluded")*100/T.length)+"%":"–","tasks concluded")}</div>
+  <div style="margin-top:14px"><b>My performance check</b> <small class="m">your own figures — name it, add a value and an optional target</small></div>
+  <div class="stats" style="margin-top:8px">${metrics.map(m=>`<div class="stat mxs"><input data-mx="${m.id}" data-mf="label" value="${esc(m.label)}" placeholder="Metric name"><div class="row" style="margin:4px 0;justify-content:center"><input type="number" data-mx="${m.id}" data-mf="value" value="${esc(m.value)}" placeholder="Value"><input type="number" data-mx="${m.id}" data-mf="target" value="${esc(m.target)}" placeholder="Target"></div><small id="pc${m.id}">${pctT(m)}</small><button data-mxdel="${m.id}" title="Remove">✕</button></div>`).join("")}<button id="mxadd" style="min-width:100px">＋ Add metric</button></div>`}
+const entries=fn=>{const r=[];sorted().forEach(d=>d.tasks.forEach(t=>{if(!fn||fn(t,d))r.push([t,d])}));return r};
+const entriesList=()=>entries(match).sort((a,b)=>b[1].date.localeCompare(a[1].date)||(b[0].pri?1:0)-(a[0].pri?1:0)||(b[0].created||"").localeCompare(a[0].created||""));
+function render(){
+  if(!ready)return;
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.view===view));
+  ["home","import","reports","export"].forEach(v=>{$("#v-"+v).hidden=v!==view});
+  $("#vn").textContent={home:"🏠 Homepage",import:"📥 Import",reports:"📊 Reports",export:"📤 Export"}[view];
+  if(view!=="home")return;
+  summary();
+  $("#clients").innerHTML=[...new Set(days.flatMap(d=>d.tasks.map(t=>t.client).filter(Boolean)))].map(c=>`<option value="${esc(c)}">`).join("");
+  const S=sorted(),T=today(),un=[];S.slice(-5).forEach(d=>d.tasks.forEach(t=>{if(t.status!=="Concluded")un.push([t,d])}));
+  $("#left").innerHTML=un.length&&!filtering()?`<div class="card"><button class="lo" data-a="lc" style="border:0;background:none;font-weight:700">${lc?"▸":"▾"} 👀 Where did I leave off?</button>`+(lc?[]:un.slice(-6)).map(([t,d])=>`<button class="lo" data-go="${t.id}">${t.pri?"★ ":""}${esc(t.title)} <small class="m">${esc(t.client)} · ${d.date} · ${t.status} →</small></button>`).join("")+`</div>`:"";
+  const L=entriesList(),fk=JSON.stringify(F);if(fk!==lastFK){page=1;lastFK=fk}
+  const pages=Math.max(1,Math.ceil(L.length/PER));page=Math.min(Math.max(1,Number(page)||1),pages);
+  let prev="",h="";
+  L.slice((page-1)*PER,page*PER).forEach(([t,d])=>{
+    if(d.id!==prev){prev=d.id;const op=d.tasks.filter(x=>x.status!=="Concluded").length;
+      h+=`<div class="dayh" data-d="${d.id}" style="margin-top:18px"><h2>DAY ${P2(dayNo(d.id))}</h2><b>📅 ${wkday(d.date)}, ${fmtD(d.date)}</b><small class="m">· ${d.tasks.length} entr${d.tasks.length==1?"y":"ies"}</small>${d.date===T?`<span class="pill now">today</span>`:""}<span style="flex:1"></span><button data-a="delday">Delete day</button></div>`}
+    h+=taskHTML(t,d)});
+  $("#journal").innerHTML=h||`<div class="empty card">${days.some(d=>d.tasks.length)?"No entries match your filters.":"No entries yet. Click “New Entry” to log your first one."}</div>`;
+  $("#pager").innerHTML=L.length?`<div class="card pager"><small class="m">Showing ${(page-1)*PER+1}–${Math.min(page*PER,L.length)} of ${L.length}</small><span class="sp"></span><button data-pg="1">«</button><button data-pg="${page-1}">‹</button><span>Page <input id="pgn" type="number" min="1" max="${pages}" value="${page}"> of ${pages}</span><button data-pg="${page+1}">›</button><button data-pg="${pages}">»</button></div>`:""}
+function focusTask(id){const f=findTask(id);if(!f)return;clearFilters(true);view="home";lastFK=JSON.stringify(F);const i=entriesList().findIndex(([t])=>t.id===id);page=Math.floor(i/PER)+1;render();const el=document.getElementById(id);if(el){window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-100,behavior:"smooth"});el.classList.add("hl");setTimeout(()=>el.classList.remove("hl"),2200)}}
+function clearFilters(quiet){F={q:"",s:"",c:"",f:"",t:""};["q","fs","fc","ff","ft"].forEach(k=>$("#"+k).value="");updDt();delete $("#out").dataset.keep;if(!quiet){$("#out").innerHTML="";render()}}
+function addTask(dayId,inp){
+  let v=inp.value.trim();if(!v){inp.focus();toast("A task needs a heading.");return}
+  let client="";const m=v.match(/^(.*?)\s+@(.+)$/);if(m){v=m[1].trim();client=m[2].trim()}
+  if(!v){toast("A task needs a heading.");return}
+  const d=clone(days.find(x=>x.id===dayId));d.tasks.push(mkTask(v,{client}));inp.value="";persist(d);render()}
+function carry(dId,ids){
+  const S=sorted(),src=days.find(x=>x.id===dId),idx=S.findIndex(x=>x.id===dId),prev=S[idx+1]?clone(S[idx+1]):null,tgt=prev?clone(prev):newDay(addD(src.date,1));let n=0;
+  src.tasks.forEach(t=>{if(ids.includes(t.id)&&!tgt.tasks.some(x=>x.from===t.id)){tgt.tasks.push(mkTask(t.title,{client:t.client,remarks:t.remarks,status:t.status,kind:t.kind,reason:t.reason,pri:t.pri,due:t.due,origin:t.origin||t.id,from:t.id}));n++}});
+  if(!n){toast("Already carried forward to that day.");return}
+  persist(tgt);render();toast(`Carried ${n} to ${tgt.date} ✓`,()=>{if(prev)persist(prev);else remove(tgt.id);render()})}
+document.addEventListener("click",e=>{
+  const tg=e.target.closest("[data-tag]");if(tg){$("#q").value=F.q=tg.dataset.tag;render();window.scrollTo({top:0,behavior:"smooth"});return}
+  const g=e.target.closest("[data-go]");if(g){focusTask(g.dataset.go);return}
+  const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;
+  const a=b.dataset.a,dEl=b.closest("[data-d]"),dId=dEl&&dEl.dataset.d,tEl=b.closest("[data-t]");
+  if(a==="lc"){lc=!lc;render()}else if(a==="fold"){closed.has(dId)?closed.delete(dId):closed.add(dId);render()}
+  else if(a==="add")addTask(dId,dEl.querySelector("[data-a=addin]"));
+  else if(a==="carryall"){const d=days.find(x=>x.id===dId);carry(dId,d.tasks.filter(t=>t.status!=="Concluded").map(t=>t.id))}
+  else if(a==="delday"){const d=days.find(x=>x.id===dId),snap=clone(d);remove(dId);render();toast(`Day ${P2(dayNo(dId)||1)} deleted.`,()=>{persist(snap);render()})}
+  else if(tEl){
+    const tid=tEl.dataset.t,d=clone(days.find(x=>x.id===dId)),prev=clone(d),i=d.tasks.findIndex(x=>x.id===tid),t=d.tasks[i];
+    if(a==="del"){d.tasks.splice(i,1);persist(d);render();toast("Task deleted.",()=>{persist(prev);render()})}
+    else if(a==="dup"){d.tasks.splice(i+1,0,mkTask(t.title,{client:t.client,remarks:t.remarks,status:t.status,kind:t.kind,reason:t.reason,pri:t.pri,due:t.due}));persist(d);render();toast("Duplicated.",()=>{persist(prev);render()})}
+    else if(a==="star"){t.pri=!t.pri;t.updated=new Date().toISOString();persist(d);render()}
+    else if(a==="carry")carry(dId,[tid])
+  }});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&e.target.dataset.a==="addin")addTask(e.target.closest("[data-d]").dataset.d,e.target);
+  else if(e.key==="/"&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){e.preventDefault();$("#q").focus()}});
+document.addEventListener("change",e=>{
+  const el=e.target;
+  if(el.dataset.a==="date"){if(!el.value){render();return}const d=clone(days.find(x=>x.id===el.closest("[data-d]").dataset.d));d.date=el.value;persist(d);render();return}
+  if(!el.dataset.f)return;clearTimeout(dtm);typing=false;
+  const tid=el.closest("[data-t]")?.dataset.t,toU=el.dataset.f==="status"&&el.value==="Unsettled"&&findTask(tid)?.t.status!=="Unsettled";
+  commit(el,true);
+  if(toU)askReason("",r=>{const f=findTask(tid);if(!f)return;const d=clone(f.d),t=d.tasks.find(x=>x.id===tid);t.reason=r;t.updated=new Date().toISOString();persist(d);render()})});
+function commit(el,rr){
+  const f=el.dataset.f,tEl=el.closest("[data-t]");if(!f||!tEl)return;
+  const dd=days.find(x=>x.id===tEl.dataset.d);if(!dd)return;
+  const d=clone(dd),t=d.tasks.find(x=>x.id===tEl.dataset.t);if(!t)return;
+  if(f==="title"&&!el.value.trim()){if(rr){el.value=t.title;toast("Heading can’t be empty.")}setSync();return}
+  const nv=f==="mins"?Math.max(0,Number(el.value)||0):el.value;if(t[f]===nv){setSync();if(rr)render();return}
+  t[f]=nv;t.updated=new Date().toISOString();persist(d);if(rr)render()}
+document.addEventListener("input",e=>{const el=e.target;
+  if(!el.dataset.f||el.tagName==="SELECT"||el.type==="date")return;
+  typing=true;setSync();clearTimeout(dtm);dtm=setTimeout(()=>{typing=false;try{commit(el,false)}finally{setSync()}},600)});
+function makeDay(date){const d=newDay(date);persist(d);render();setTimeout(()=>{const el=document.querySelector(`[data-d="${d.id}"]`);el&&el.scrollIntoView({behavior:"smooth"})},50)}
+
+function askReason(init,cb){
+  const m=document.createElement("div");m.className="modal top";
+  m.innerHTML=`<div class="card mbox"><b>Unsettled — add remarks</b><br><small class="m">Why is it unsettled, or what work is involved?</small><textarea id="rs" rows="4" style="width:100%;margin-top:8px;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--bg)"></textarea><div class="row"><span class="sp"></span><button id="rk">Skip</button><button class="pri" id="rv">Save remarks</button></div></div>`;
+  document.body.appendChild(m);const ta=m.querySelector("#rs");ta.value=init||"";ta.focus();
+  const done=v=>{m.remove();if(v!==null)cb(v)};
+  m.querySelector("#rv").onclick=()=>done(ta.value.trim());m.querySelector("#rk").onclick=()=>done(null)}
+function openEntry(){
+  const m=document.createElement("div");m.className="modal";let kind="Task",reason="";
+  m.innerHTML=`<div class="card mbox"><div class="row" style="margin:0"><b style="font-size:18px">New Entry</b><span class="sp"></span><button id="xc">✕</button></div>
+  <label class="fld">Date<input type="date" id="edt" value="${today()}"></label>
+  <label class="fld">Client<input id="ecl" list="clients" autocomplete="off" placeholder="Pick a previous client or type a new one"></label>
+  <div class="fld">This entry is a…<div class="seg"><button type="button" data-k="Task" class="on">✅ Task</button><button type="button" data-k="Meeting">👥 Meeting</button></div></div>
+  <label class="fld"><span id="elt">Short title</span><input id="eti" placeholder="e.g. Reconcile Q3 invoices"></label>
+  <label class="fld"><span id="eld">Description</span><textarea id="ede" rows="3" placeholder="What was involved, ticket IDs, outcomes… use #tags"></textarea></label>
+  <label class="fld" id="esw">Status<select id="est"><option value="Concluded">✅ Concluded</option><option value="Unsettled">⏳ Unsettled</option><option value="Queued" selected>🕒 Queued</option></select></label>
+  <div class="fld" id="erz" hidden>Remarks: <span id="ert" style="color:var(--ink)"></span> <button type="button" id="erb">Edit</button></div>
+  <div class="row"><span class="sp"></span><button id="ecn">Cancel</button><button class="pri" id="esv">Save entry</button></div></div>`;
+  document.body.appendChild(m);const q=s=>m.querySelector(s);
+  const close=()=>m.remove(),showR=()=>{q("#erz").hidden=!reason;q("#ert").textContent=reason};
+  q("#xc").onclick=q("#ecn").onclick=close;
+  m.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{kind=b.dataset.k;m.querySelectorAll("[data-k]").forEach(x=>x.classList.toggle("on",x===b));
+    const T=kind==="Task";q("#esw").hidden=!T;q("#elt").textContent=T?"Short title":"Meeting title";q("#eld").textContent=T?"Description":"Notes";if(!T){reason="";showR()}});
+  q("#est").onchange=()=>{if(q("#est").value==="Unsettled")askReason(reason,r=>{reason=r;showR()});else{reason="";showR()}};
+  q("#erb").onclick=()=>askReason(reason,r=>{reason=r;showR()});
+  q("#esv").onclick=()=>{const title=q("#eti").value.trim();if(!title){q("#eti").focus();toast("A short title is required.");return}
+    const date=q("#edt").value||today(),isT=kind==="Task",status=isT?q("#est").value:"Concluded",ex=days.find(x=>x.date===date),d=ex?clone(ex):newDay(date);
+    const t=mkTask(title,{client:q("#ecl").value.trim(),remarks:q("#ede").value.trim(),status,kind,reason:status==="Unsettled"?reason:""});
+    d.tasks.push(t);closed.delete(d.id);persist(d);close();render();toast(`Entry saved to ${date} ✓`);
+    setTimeout(()=>{const el=document.getElementById(t.id);el&&el.scrollIntoView({behavior:"smooth",block:"center"})},60)};
+  q("#eti").focus()}
+$("#nd").onclick=openEntry;
+function updDt(){["ff","ft"].forEach(id=>{const v=$("#"+id).value;$("#"+id+"l").textContent=v?" "+v:""})}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b)return;const i=$("#"+b.dataset.pick);try{i.showPicker()}catch(x){i.focus();i.click()}});
+["ff","ft"].forEach(id=>$("#"+id).addEventListener("change",e=>{F[id==="ff"?"f":"t"]=e.target.value;delete $("#out").dataset.keep;updDt();render()}));
+const bind=(id,k)=>$("#"+id).addEventListener("input",e=>{F[k]=e.target.value.trim();delete $("#out").dataset.keep;updDt();render()});
+bind("q","q");bind("fs","s");bind("fc","c");bind("ff","f");bind("ft","t");
+$("#fs").addEventListener("change",e=>{F.s=e.target.value;delete $("#out").dataset.keep;render()});
+$("#clr").onclick=()=>clearFilters();
+$("#theme").onclick=()=>{const r=document.documentElement;r.dataset.theme=(r.dataset.theme==="dark"||(!r.dataset.theme&&matchMedia("(prefers-color-scheme:dark)").matches))?"light":"dark";try{localStorage.setItem("wwid-theme",r.dataset.theme)}catch(e){}};
+try{const th=localStorage.getItem("wwid-theme");if(th)document.documentElement.dataset.theme=th}catch(e){}
+function putDoc(id,obj){pending++;setSync();let to;return Promise.race([col.doc(id).set(clone(obj)),new Promise((_,r)=>{to=setTimeout(()=>r(0),8000)})]).then(()=>{clearTimeout(to);pending--;setSync()}).catch(()=>{clearTimeout(to);pending--;errCount++;lastFail=()=>putDoc(id,obj);setSync()})}
+document.addEventListener("click",e=>{
+  const v=e.target.closest("[data-view]");if(v){view=v.dataset.view;render();window.scrollTo(0,0);return}
+  const pg=e.target.closest("[data-pg]");if(pg){page=+pg.dataset.pg;render();$("#journal").scrollIntoView();return}
+  if(e.target.id==="mxadd"){metrics.push({id:"m"+uid8(),label:"",value:"",target:""});putDoc("_metrics",{items:metrics});summary();return}
+  const md=e.target.closest("[data-mxdel]");if(md){metrics=metrics.filter(m=>m.id!==md.dataset.mxdel);putDoc("_metrics",{items:metrics});summary();return}
+  const im=e.target.closest("[data-imp]");if(im){$("#"+im.dataset.imp).click();return}
+  const tp=e.target.closest("[data-tpl]");if(tp){emit(tp.dataset.tpl,"intheloop-import-template",TH,[[today(),"Acme Corp","Task","Reconcile invoices","Matched Q3 payments","Concluded",""],[today(),"Acme Corp","Task","Chase approval","Waiting on finance","Unsettled","Approver on leave"],[today(),"Acme Corp","Meeting","Kick-off call","Agreed scope","",""]]);return}
+  const rp=e.target.closest("[data-rep]");if(rp){doReport(rp.dataset.rep,rp.dataset.fmt);return}
+  const ex=e.target.closest("[data-exp]");if(ex)doExport(ex.dataset.exp);
+  if(e.target.id==="rcx")$("#rout").innerHTML=""});
+document.addEventListener("change",e=>{const el=e.target;
+  if(el.id==="pgn"){page=Number(el.value)||1;render();return}
+  if(el.dataset.mx){const m=metrics.find(x=>x.id===el.dataset.mx);if(!m)return;const k=el.dataset.mf;m[k]=k==="label"?el.value:(el.value===""?"":Number(el.value));putDoc("_metrics",{items:metrics});const p=document.getElementById("pc"+m.id);if(p)p.textContent=pctT(m)}});
+// ----- file helpers -----
+const MIME={xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",csv:"text/csv",tsv:"text/tab-separated-values",html:"text/html",md:"text/markdown"};
+const TH=["Date","Client","Type","Title","Description","Status","Reason"];
+const EH=["Day","Date","Client","Type","Title","Description","Status","Unsettled remarks","Priority","Due","Carried from","Created","Updated"];
+const erow=(t,d)=>{const f=t.from&&findTask(t.from);return[dayNo(d.id),d.date,t.client,t.kind||"Task",t.title,t.remarks,t.status,t.reason||"",t.pri?"Yes":"",t.due||"",f?"Day "+dayNo(f.d.id):"",t.created,t.updated]};
+const csvOf=(H,R)=>[H,...R].map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(",")).join("\r\n");
+const flat=c=>String(c??"").replace(/[\t\r\n]+/g," ");
+async function save(filename,data,type){
+  if(dl){try{await dl.save({filename,data:new Blob([data],{type})})}catch(e){toast("Save cancelled or failed.")}return}
+  try{const u=URL.createObjectURL(new Blob([data],{type:type||"application/octet-stream"})),a=document.createElement("a");a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}catch(e){toast("Couldn’t download that file.")}}
+const xlsxData=sh=>{const wb=XLSX.utils.book_new();sh.forEach(([n,H,R])=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([H,...R]),n.replace(/[\\\/?*\[\]:]/g,"").slice(0,31)||"Sheet"));return XLSX.write(wb,{bookType:"xlsx",type:"array"})};
+function fileData(fmt,H,R,title){
+  if(fmt==="csv")return"\ufeff"+csvOf(H,R);
+  if(fmt==="tsv")return[H,...R].map(r=>r.map(flat).join("\t")).join("\r\n");
+  if(fmt==="md")return"| "+H.map(flat).join(" | ")+" |\n|"+H.map(()=>"---").join("|")+"|\n"+R.map(r=>"| "+r.map(c=>flat(c).replace(/\|/g,"\\|")).join(" | ")+" |").join("\n");
+  return`<!doctype html><meta charset="utf-8"><title>${esc(title)}</title><body style="font-family:system-ui,sans-serif"><h2>${esc(title)}</h2><table border="1" cellpadding="6" style="border-collapse:collapse"><tr>${H.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${R.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>`}
+async function emit(fmt,base,H,R){
+  if(fmt==="xlsx"){if(typeof XLSX==="undefined"){toast("Excel support didn’t load — use CSV instead.");return}return save(base+".xlsx",xlsxData([["Data",H,R]]),MIME.xlsx)}
+  return save(base+"."+fmt,fileData(fmt,H,R,base),MIME[fmt])}
+function doExport(fmt){
+  if(fmt==="json")return save("intheloop-backup-"+today()+".json",JSON.stringify(days,null,1),"application/json");
+  const L=$("#escope").value==="filtered"?entries(match):entries();
+  if(!L.length){toast("Nothing to export.");return}
+  emit(fmt,"intheloop-entries-"+today(),EH,L.map(([t,d])=>erow(t,d)))}
+// ----- reports -----
+const Rg=()=>{const f=$("#rf").value,t=$("#rt").value;return(tk,d)=>(!f||d.date>=f)&&(!t||d.date<=t)};
+const pct=(a,b)=>b?Math.round(a*100/b)+"%":"–";
+function aggr(kh,kf,L){const g={};L.forEach(([t,d])=>{const k=kf(t,d)||"(none)";(g[k]=g[k]||[]).push(t)});
+  return[[kh,"Entries","Tasks","Meetings","Concluded","Unsettled","Queued","Completion"],Object.keys(g).sort().map(k=>{const E=g[k],T=E.filter(t=>(t.kind||"Task")==="Task"),c=s=>T.filter(t=>t.status===s).length;return[k,E.length,T.length,E.length-T.length,c("Concluded"),c("Unsettled"),c("Queued"),pct(c("Concluded"),T.length)]})]}
+const REP={
+ entries:{n:"Full entries log",d:"Every entry in the range with all its details",f:L=>[EH,L.map(([t,d])=>erow(t,d))]},
+ daily:{n:"Daily summary",d:"Entries, meetings and status counts for each day",f:L=>aggr("Date",(t,d)=>d.date,L)},
+ weekly:{n:"Weekly performance",d:"Throughput and completion rate per week (weeks start Monday)",f:L=>aggr("Week starting",(t,d)=>addD(d.date,-((new Date(d.date+"T00:00:00Z").getUTCDay()+6)%7)),L)},
+ client:{n:"Client-wise report",d:"Workload, status mix and completion rate for each client",f:L=>aggr("Client",t=>t.client,L)},
+ followup:{n:"Open items follow-up",d:"Unsettled and queued tasks with reasons and how long they have been open",f:L=>[["Date","Client","Title","Status","Reason / description","Days open"],L.filter(([t])=>(t.kind||"Task")==="Task"&&t.status!=="Concluded").map(([t,d])=>[d.date,t.client,t.title,t.status,t.reason||t.remarks,Math.round((Date.parse(today())-Date.parse(d.date))/864e5)])]},
+ meetings:{n:"Meetings log",d:"All meetings with client and notes",f:L=>[["Date","Client","Meeting","Notes"],L.filter(([t])=>t.kind==="Meeting").map(([t,d])=>[d.date,t.client,t.title,t.remarks])]}};
+function doReport(k,fmt){
+  if(k==="all"){if(typeof XLSX==="undefined"){toast("Excel support didn’t load.");return}const L=entries(Rg());save("intheloop-all-reports-"+today()+".xlsx",xlsxData(Object.values(REP).map(r=>{const[H,R]=r.f(L);return[r.n,H,R]})),MIME.xlsx);return}
+  const[H,R]=REP[k].f(entries(Rg()));
+  if(!R.length){toast("No data for that report in this range.");return}
+  if(fmt==="view"){$("#rout").innerHTML=`<div class="card"><b>${REP[k].n}</b> <button id="rcx">✕</button><div style="overflow-x:auto;margin-top:8px"><table class="tb"><tr>${H.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${R.slice(0,200).map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table></div><small class="m">${R.length} row${R.length==1?"":"s"}${R.length>200?" (showing 200)":""}</small></div>`;$("#rout").scrollIntoView({behavior:"smooth"})}
+  else emit(fmt,`intheloop-${k}-${today()}`,H,R)}
+$("#rlist").innerHTML=Object.entries(REP).map(([k,r])=>`<div class="card"><b>${r.n}</b><br><small class="m">${r.d}</small><div class="row"><button data-rep="${k}" data-fmt="view">👁 Preview</button><button data-rep="${k}" data-fmt="xlsx">⬇ Excel</button><button data-rep="${k}" data-fmt="csv">⬇ CSV</button><button data-rep="${k}" data-fmt="html">⬇ HTML</button></div></div>`).join("")+`<div class="card"><b>All reports in one workbook</b><br><small class="m">One Excel file with a sheet per report</small><div class="row"><button class="pri" data-rep="all" data-fmt="xlsx">⬇ Download workbook</button></div></div>`;
+$("#ai").onclick=async()=>{
+  if(!sample){toast("AI reports aren’t available in this view.");return}
+  const L=entries(Rg());if(!L.length){toast("No entries in that range.");return}
+  $("#aiw").hidden=false;$("#aiq").textContent="Thinking…";
+  const data=L.map(([t,d])=>[d.date,t.title,t.client||"-",t.kind||"Task",t.status,t.remarks,t.reason].join(" | ")).join("\n");
+  try{await sample("Write a concise, professional work report from this log (date | title | client | type | status | description | reason if unsettled). Group by client, lead with outcomes, then list unsettled and queued items with next steps. Plain text, no preamble, no invented facts.\n\n"+data,{cache:false,onText:({text})=>{$("#aiq").textContent=text}})}
+  catch(e){$("#aiq").textContent=e&&e.code==="not_granted"?"Permission declined.":"Couldn’t generate a report right now."}};
+$("#aicp").onclick=()=>navigator.clipboard.writeText($("#aiq").textContent).then(()=>toast("Copied."));
+$("#aidl").onclick=()=>save("intheloop-ai-report-"+today()+".txt",$("#aiq").textContent,"text/plain");
+// ----- import -----
+const ALIAS={date:["date","day","entry date"],client:["client","client name"],kind:["type","kind","entry type"],title:["title","short title","task","task heading","heading","subject","meeting title"],desc:["description","remarks","notes","details"],status:["status"],reason:["reason","unsettled remarks","unsettled reason"]};
+function pdate(v){if(v instanceof Date){const d=new Date(v.getTime()+3e4);return d.getFullYear()+"-"+P2(d.getMonth()+1)+"-"+P2(d.getDate())}
+  v=String(v??"").trim();let m,r="";
+  if(m=v.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/))r=`${m[1]}-${P2(m[2])}-${P2(m[3])}`;
+  else if(m=v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/))r=`${m[3]}-${P2(m[2])}-${P2(m[1])}`;
+  else if(/^\d{5}$/.test(v))r=iso(new Date(Date.UTC(1899,11,30)+(+v)*864e5));
+  const d=new Date(r+"T00:00:00Z");return r&&!isNaN(d)&&iso(d)===r?r:""}
+const normS=v=>{v=String(v||"").trim().toLowerCase();return/^(concl|compl|done|closed|finish)/.test(v)?"Concluded":/^(unsett|in prog|open|hold|block)/.test(v)?"Unsettled":"Queued"};
+function importRows(objs){
+  const by={};let skip=0,n=0;
+  objs.forEach(r0=>{const r={};Object.keys(r0).forEach(k=>{r[k.trim().toLowerCase()]=r0[k]});
+    const g=a=>{for(const k of ALIAS[a]){const v=r[k];if(v instanceof Date)return v;if(v!==undefined&&String(v).trim()!=="")return String(v).trim()}return ""};
+    const title=String(g("title")),rd=g("date"),date=rd?pdate(rd):today();
+    if(!title||!date){skip++;return}
+    const kind=/meet/i.test(String(g("kind")))?"Meeting":"Task",status=kind==="Meeting"?"Concluded":normS(g("status"));
+    (by[date]=by[date]||[]).push(mkTask(title,{client:String(g("client")),remarks:String(g("desc")),status,kind,reason:status==="Unsettled"?String(g("reason")):""}));n++});
+  Object.entries(by).forEach(([date,ts])=>{const ex=days.find(x=>x.date===date),d=ex?clone(ex):newDay(date);d.tasks.push(...ts);persist(d)});
+  render();$("#iout").innerHTML=`<div class="card"><b>Import finished</b><br>✅ ${n} entr${n==1?"y":"ies"} added across ${Object.keys(by).length} day${Object.keys(by).length==1?"":"s"}${skip?`<br>⚠ ${skip} row${skip==1?"":"s"} skipped (no title or unreadable date)`:""}</div>`;
+  toast(n?`Imported ${n} entries ✓`:"No valid rows found in that file.")}
+function parseCSV(t){t=t.replace(/^\ufeff/,"");const f=t.split(/\r?\n/)[0]||"",dm=[",",";","\t"].sort((a,b)=>f.split(b).length-f.split(a).length)[0],R=[];let r=[],c="",q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch==='"')q=true;else if(ch===dm){r.push(c);c=""}
+    else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&t[i+1]==="\n")i++;r.push(c);c="";R.push(r);r=[]}else c+=ch}
+  if(c||r.length){r.push(c);R.push(r)}
+  const H=(R.shift()||[]).map(h=>h.trim());return R.filter(x=>x.some(v=>v.trim())).map(x=>Object.fromEntries(H.map((h,i)=>[h,x[i]??""])))}
+const pick=(id,fn)=>{$("#"+id).onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{await fn(f)}catch(x){toast("Couldn’t read that file — check the format and try again.")}}};
+pick("impx",async f=>{if(typeof XLSX==="undefined")throw 0;const wb=XLSX.read(await f.arrayBuffer(),{type:"array",cellDates:true});importRows(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:true}))});
+pick("impc",async f=>importRows(parseCSV(await f.text())));
+pick("impj",async f=>{const arr=JSON.parse(await f.text());if(!Array.isArray(arr))throw 0;let n=0;
+  arr.forEach(d=>{if(!d||typeof d.id!=="string"||!/^\d{4}-\d\d-\d\d$/.test(d.date)||!Array.isArray(d.tasks))return;d.tasks=d.tasks.filter(t=>t&&t.id&&t.title).map(t=>({...mkTask(t.title),...t}));persist(fix(d));n++});
+  render();toast(n?`Restored ${n} day${n==1?"":"s"} ✓`:"No valid days found in that file.")});
+(async()=>{
+  toast(MSG[Math.floor(Math.random()*MSG.length)]);
+  // Start instantly on this device so the app always works, then upgrade to the synced database if available.
+  let L={};try{L=JSON.parse(localStorage.getItem("wwid")||"{}")}catch(e){}
+  const sv=()=>{try{localStorage.setItem("wwid",JSON.stringify(L))}catch(e){}};
+  col={doc:id=>({set:async d=>{L[id]=d;sv()},delete:async()=>{delete L[id];sv()}})};local=true;
+  days=Object.entries(L).filter(([id])=>id!=="_metrics").map(([id,d])=>fix({...d,id}));metrics=(L._metrics&&L._metrics.items)||[];ready=true;setSync();render();
+  const T=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r(null),ms))]);
+  const U=n=>typeof claude==="undefined"?Promise.resolve(null):T(Promise.resolve().then(()=>claude.use(n)).catch(()=>null),6000);
+  const [db,user,smp,dwn]=await Promise.all([U("db"),U("user"),U("sample"),U("downloads")]);sample=smp;dl=dwn;if(!sample){const ac=$("#ai");if(ac&&ac.closest(".card"))ac.closest(".card").hidden=true}
+  let uid=null;if(db&&user)try{uid=await T(user.id(),5000)}catch(e){}
+  if(!uid)return;
+  const rc=db.collection("data/users/"+uid+"/days");let first=true;
+  try{rc.onSnapshot(s=>{
+    const rm=s.docs.find(d=>d.id==="_metrics"),remote=s.docs.filter(d=>d.id!=="_metrics").map(d=>fix({...d.data(),id:d.id}));if(rm)metrics=rm.data().items||[];else if(first&&metrics.length)putDoc("_metrics",{items:metrics});
+    if(first){first=false;const mine=days.slice(),ids=new Set(remote.map(d=>d.id));days=remote;col=rc;local=false;
+      mine.forEach(d=>{if(!ids.has(d.id))persist(d)});try{localStorage.removeItem("wwid")}catch(e){}}
+    else days=remote;
+    setSync();const a=document.activeElement;if(a&&/INPUT|TEXTAREA/.test(a.tagName)&&(a.dataset.f||a.dataset.mx||a.id==="pgn"||a.dataset.a==="addin"))return;render()},()=>{})}catch(e){}
+})();
+</script></body></html>
